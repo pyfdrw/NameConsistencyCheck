@@ -27,6 +27,7 @@ namespace NameConsistencyCheck
         static void Execute(Application app)
         {
             // TODO: add here your code
+            var pp = app.OpenPatientById("123");
         }
     }
 }
