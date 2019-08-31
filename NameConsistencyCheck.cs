@@ -5,6 +5,10 @@ using System.Collections.Generic;
 using VMS.TPS.Common.Model.API;
 using VMS.TPS.Common.Model.Types;
 
+using Autofac;
+using NameConsistencyCheck.Startup;
+using NameConsistencyCheck.Views;
+
 namespace NameConsistencyCheck
 {
     class Program
@@ -27,7 +31,10 @@ namespace NameConsistencyCheck
         static void Execute(Application app)
         {
             // TODO: add here your code
-            var pp = app.OpenPatientById("123");
+            var bs = new Bootstrapper();
+            var container = bs.Bootstrap(app);
+            var mainView = container.Resolve<CheckMainView>();
+            mainView.ShowDialog();
         }
     }
 }

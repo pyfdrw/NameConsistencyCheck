@@ -12,16 +12,21 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using NameConsistencyCheck.ViewModels;
 
 namespace NameConsistencyCheck.Views
 {
     /// <summary>
     /// CheckMainView.xaml 的交互逻辑
     /// </summary>
-    public partial class CheckMainView : UserControl
+    public partial class CheckMainView : Window
     {
-        public CheckMainView()
+        private CheckMainViewModel _checkMainViewModel;
+
+        public CheckMainView(CheckMainViewModel checkMainViewModel)
         {
+            _checkMainViewModel = checkMainViewModel;
+            this.DataContext = _checkMainViewModel;
             InitializeComponent();
         }
     }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Prism.Mvvm;
 using VMS.TPS.Common.Model.API;
 using VMS.TPS.Common.Model.Types;
+using System.Windows.Media;
 
 namespace NameConsistencyCheck.Models
 {
@@ -36,20 +37,39 @@ namespace NameConsistencyCheck.Models
         }
 
         // 是否符合命名要求
-        private bool _isConsistent = false;
+        private bool _isConsistent;
 
         public bool IsConsistent
         {
             get { return _isConsistent; }
             set
             {
+                if (!value)
+                {
+                    SolidColorBrush = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0));
+                }
+                else
+                {
+                    SolidColorBrush = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+                }
                 SetProperty(ref _isConsistent, value);
+            }
+        }
+
+        // 不符合要求则醒目的背景色
+        private SolidColorBrush _solidColorBrush = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+        public SolidColorBrush SolidColorBrush
+        {
+            get { return _solidColorBrush; }
+            set
+            {
+                SetProperty(ref _solidColorBrush, value);
             }
         }
 
         public bool IsAllDatainished = false;
 
-        public FieldModel(Beam _oneField, string _sessions = "A", string part = "a")
+        public FieldModel(Beam _oneField)
         {
             BeamId = _oneField.Id;
 
@@ -57,10 +77,10 @@ namespace NameConsistencyCheck.Models
             if (_oneField.IsSetupField)
             {
                 // 判断CBCT或者0/90
-                if (Math.Abs(Math.Abs(_oneField.ControlPoints[0].JawPositions.X1) - 5.0) < 0.1) // -5 5 -5 5
+                if (Math.Abs(Math.Abs(_oneField.ControlPoints[0].JawPositions.X1) - 50.0) < 0.1) // -5 5 -5 5
                 {
                     RecommendId = "CBCT";
-                    if (RecommendId.ToLower().Equals(_oneField.Id))
+                    if (RecommendId.ToLower().Equals(_oneField.Id.ToLower()))
                     {
                         IsConsistent = true;
                         IsAllDatainished = true;
@@ -71,7 +91,7 @@ namespace NameConsistencyCheck.Models
                 else if (_oneField.ControlPoints[0].GantryAngle.Equals(0))
                 {
                     RecommendId = "0";
-                    if (RecommendId.ToLower().Equals(_oneField.Id))
+                    if (RecommendId.ToLower().Equals(_oneField.Id.ToLower()))
                     {
                         IsAllDatainished = true;
                         IsConsistent = true;
@@ -81,7 +101,7 @@ namespace NameConsistencyCheck.Models
                 else if (_oneField.ControlPoints[0].GantryAngle.Equals(90))
                 {
                     RecommendId = "90";
-                    if (RecommendId.ToLower().Equals(_oneField.Id))
+                    if (RecommendId.ToLower().Equals(_oneField.Id.ToLower()))
                     {
                         IsAllDatainished = true;
                         IsConsistent = true;
@@ -112,8 +132,8 @@ namespace NameConsistencyCheck.Models
             if (isStatic)
             {
                 int beamAngle = (int)_oneField.ControlPoints[0].GantryAngle;
-                RecommendId = $"{_sessions}{part}{beamAngle}";
-                if (RecommendId.ToLower().Equals(_oneField.Id))
+                RecommendId = $"{_oneField.Id[0]}{_oneField.Id[1]}{beamAngle}";
+                if (RecommendId.ToLower().Equals(_oneField.Id.ToLower()))
                 {
                     IsConsistent = true;
                     IsAllDatainished = true;
@@ -126,8 +146,8 @@ namespace NameConsistencyCheck.Models
                 int beginAngle = (int)_oneField.ControlPoints[0].GantryAngle;
                 int endAngle = (int)_oneField.ControlPoints[index: _oneField.ControlPoints.Count - 1].GantryAngle;
 
-                RecommendId = $"{_sessions}{part}G{beginAngle}-{endAngle}";
-                if (RecommendId.ToLower().Equals(_oneField.Id))
+                RecommendId = $"{_oneField.Id[0]}{_oneField.Id[1]}G{beginAngle}-{endAngle}";
+                if (RecommendId.ToLower().Equals(_oneField.Id.ToLower()))
                 {
                     IsConsistent = true;
                     IsAllDatainished = true;
@@ -136,7 +156,7 @@ namespace NameConsistencyCheck.Models
             }
 
             IsConsistent = false;
-            RecommendId = "Others";
+            // RecommendId = "Others";
             IsAllDatainished = true;
             return;
         }

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Prism.Mvvm;
 using VMS.TPS.Common.Model.API;
+using VMS.TPS.Common.Model.Types;
 
 namespace NameConsistencyCheck.Models
 {
@@ -66,7 +67,7 @@ namespace NameConsistencyCheck.Models
             }
         }
 
-        public ObservableCollection<PlanModel> PlanModels;
+        public ObservableCollection<PlanModel> PlanModels { get; set; }
 
         public bool IsAllDatainished = false;
 
@@ -78,6 +79,8 @@ namespace NameConsistencyCheck.Models
             PatientId = onePatient.Id;
             PatientName = onePatient.LastName;
             HistoryDateTime = onePatient.HistoryDateTime;
+
+            PlanModels = new ObservableCollection<PlanModel>();
 
             // Course 命名没有规定，此处跳过
 
@@ -91,7 +94,13 @@ namespace NameConsistencyCheck.Models
             // 对每个计划进行核查
             foreach (PlanSetup plan in plans)
             {
-                
+                PlanModels.Add(new PlanModel(plan));
+                if (plan.ApprovalStatus == PlanSetupApprovalStatus.TreatmentApproved)
+                    ApprovedPlanNum++;
+                else
+                {
+                    UnApprovedPlanNum++;
+                }
             }
         }
     }
